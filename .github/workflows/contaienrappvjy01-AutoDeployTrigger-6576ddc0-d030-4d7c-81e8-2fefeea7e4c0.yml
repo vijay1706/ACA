@@ -1,0 +1,42 @@
+name: Trigger auto deployment for contaienrappvjy01
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/contaienrappvjy01-AutoDeployTrigger-6576ddc0-d030-4d7c-81e8-2fefeea7e4c0.yml'
+
+  # Allow mannually trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.CONTAIENRAPPVJY01_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: containerregistryvjy.azurecr.io
+          registryUsername: ${{ secrets.CONTAIENRAPPVJY01_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CONTAIENRAPPVJY01_REGISTRY_PASSWORD }}
+          containerAppName: contaienrappvjy01
+          resourceGroup: v-goonav-mindtree
+          imageToBuild: containerregistryvjy.azurecr.io/customnginx:${{ github.sha }}
+          
+
+     
+
